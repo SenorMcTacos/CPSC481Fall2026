@@ -2,3 +2,7 @@
 pyproject.toml
 diagnostics.py
 diagnostics_gui.py
+
+
+# Ignore
+env/

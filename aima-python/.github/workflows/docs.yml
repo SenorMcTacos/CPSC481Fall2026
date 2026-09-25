@@ -1,0 +1,53 @@
+name: docs
+
+on:
+  push:
+    branches: [master]
+
+# allow the workflow to publish to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive   # aima-data is needed: learning.py builds DataSets at import time
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - name: Install documentation dependencies
+        run: pip install -r docs/requirements.txt
+      - name: Build the Sphinx documentation
+        # -W --keep-going: fail the build if any page can't be imported/rendered,
+        # so an incomplete API reference can never be published silently again
+        run: sphinx-build -b html -W --keep-going docs docs/_build/html
+      - name: Build the JupyterLite browser companion (issue #1072)
+        # Published alongside the API docs at /lite/. Kept non-fatal so a Pyodide
+        # toolchain hiccup can never block the reference-docs deploy.
+        continue-on-error: true
+        run: |
+          pip install -r lite/requirements-lite.txt
+          bash lite/build.sh "$PWD/docs/_build/html/lite"
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

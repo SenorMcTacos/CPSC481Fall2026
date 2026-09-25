@@ -1,0 +1,235 @@
+
+
+# `aima-python` [![tests](https://github.com/aimacode/aima-python/actions/workflows/tests.yml/badge.svg)](https://github.com/aimacode/aima-python/actions/workflows/tests.yml) [![docs](https://github.com/aimacode/aima-python/actions/workflows/docs.yml/badge.svg)](https://aimacode.github.io/aima-python/) [![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/aimacode/aima-python/master) [![lite-badge](https://jupyterlite.rtfd.io/en/latest/_static/badge.svg)](https://aimacode.github.io/aima-python/lite/)
+
+
+Python code for the book *[Artificial Intelligence: A Modern Approach](http://aima.cs.berkeley.edu).* You can use this in conjunction with a course on AI, or for study on your own. We're looking for [solid contributors](https://github.com/aimacode/aima-python/blob/master/CONTRIBUTING.md) to help.
+
+# Updates for 4th Edition
+
+The 4th edition of the book is out now in 2020, and thus we are updating the code. All code here will reflect the 4th edition. Changes include:
+
+- Move from Python 3.5 to 3.7, and on to modern Python (the code now runs on Python 3.9 and up).
+- More emphasis on Jupyter (Ipython) notebooks.
+- More projects using external packages (tensorflow, etc.).
+
+**Edition policy (3rd vs 4th).** As [Peter Norvig stated](https://github.com/aimacode/aima-python/issues/1188#issuecomment-641669882), we are *not* maintaining two parallel editions — all new work should move toward the 4th edition. Concretely:
+
+- The **4th edition is canonical**: new algorithms, fixes and pseudocode references should follow the 4e numbering and content.
+- The 3e/4e split is **done**: there is now a **single version per module** (no `*4e.py` files remain). The old 3e/4e pairs have been merged — the canonical implementation was kept and any genuinely-new 4e algorithms were folded in — and the 4e-only modules (`deep_learning.py`, `game_theory.py`, `making_simple_decisions.py`, `perception.py`) were de-suffixed. Add new 4e content directly to the relevant module.
+
+
+
+# Structure of the Project
+
+When complete, this project will have Python implementations for all the pseudocode algorithms in the book, as well as tests and examples of use. The code is organised into these top-level folders:
+
+- **`aima/`** — the importable Python package: one module per major topic (e.g. `aima/search.py`) with the implementations of the pseudocode algorithms and their support functions/classes/data.
+- **`notebooks/`** — the Jupyter notebooks that explain and demonstrate the code (e.g. `notebooks/search.ipynb`), plus the per-chapter `notebooks/chapterNN/` demos. Each notebook starts with a `%run bootstrap.ipynb` cell that puts the repo root on `sys.path`, so `from aima import ...` works wherever the notebook is launched. A GitHub Action ([`notebooks-to-py.yml`](.github/workflows/notebooks-to-py.yml)) keeps a readable, diffable `.py` mirror of every notebook beside it (generated with [jupytext](https://jupytext.readthedocs.io)); the `.ipynb` is the source of truth, so edit the notebook, not the generated `.py`.
+- **`tests/`** — a lightweight test suite (e.g. `tests/test_search.py`), using `assert` statements, designed for use with [`py.test`](http://pytest.org/latest/) but also usable on their own.
+- **`lite/`** — a [JupyterLite](https://jupyterlite.readthedocs.io) proof-of-concept that runs a few notebooks entirely in the browser via [Pyodide](https://pyodide.org), no install required (try it [here](https://aimacode.github.io/aima-python/lite/); see [`lite/README.md`](lite/README.md) and [issue #1072](https://github.com/aimacode/aima-python/issues/1072)).
+
+# Python 3.9 and up
+
+The code for the 3rd edition was in Python 3.5; the 4th edition code targets Python 3.7 and runs on Python 3.9 and up, but does not run in Python 2. Continuous integration runs the full test suite (including the deep-learning modules) on Python 3.9, 3.10, 3.11 and 3.12; note that some optional dependencies (`tensorflow`, `keras`, `opencv-python`) do not yet ship wheels for the very latest releases (3.13+), so one of those versions is recommended for running everything. You can [install Python](https://www.python.org/downloads) or use a browser-based Python interpreter such as [repl.it](https://repl.it/languages/python3).
+The algorithms live in the `aima` package, so you import them as `from aima.search import astar_search` (or `from aima import search`). You can install the package in editable mode with `pip install -e .` and then run the code in an IDE, or from the command line with `python -i -m aima.search` where the `-i` option puts you in an interactive loop where you can run Python functions. All notebooks are available in a [binder environment](https://mybinder.org/v2/gh/aimacode/aima-python/master). Alternatively, visit [jupyter.org](http://jupyter.org/) for instructions on setting up your own Jupyter notebook environment.
+
+Features from Python 3.6 and 3.7 that we will be using for this version of the code:
+- [f-strings](https://docs.python.org/3.6/whatsnew/3.6.html#whatsnew36-pep498): all string formatting should be done with `f'var = {var}'`, not with `'var = {}'.format(var)` nor `'var = %s' % var`.
+- [`typing` module](https://docs.python.org/3.7/library/typing.html): declare functions with type hints: `def successors(state) -> List[State]:`; that is, give type declarations, but omit them when it is obvious. I don't need to say `state: State`, but in another context it would make sense to say `s: State`.
+- Underscores in numerics: write a million as `1_000_000` not as `1000000`.
+- [`dataclasses` module](https://docs.python.org/3.7/library/dataclasses.html#module-dataclasses): replace `namedtuple` with `dataclass`.
+
+
+[//]: # (There is a sibling [aima-docker]https://github.com/rajatjain1997/aima-docker project that shows you how to use docker containers to run more complex problems in more complex software environments.)
+
+
+## Installation Guide
+
+To download the repository:
+
+`git clone https://github.com/aimacode/aima-python.git`
+
+Then you need to install the basic dependencies to run the project on your system:
+
+```
+cd aima-python
+pip install -r requirements.txt
+```
+
+A couple of notebooks also need the [Graphviz](https://graphviz.org/download/) system
+binary (`dot`) for rendering — the `graphviz` PyPI package is only a wrapper. Install it
+with your OS package manager if needed (e.g. `apt install graphviz`, `brew install graphviz`).
+
+You also need to fetch the datasets from the [`aima-data`](https://github.com/aimacode/aima-data) repository:
+
+```
+git submodule init
+git submodule update
+```
+
+Wait for the datasets to download, it may take a while. Once they are downloaded, you need to install `pytest`, so that you can run the test suite:
+
+`pip install pytest`
+
+Then to run the tests:
+
+`py.test`
+
+And you are good to go!
+
+
+# Index of Algorithms
+
+Here is a table of algorithms, the figure, name of the algorithm in the book and in the repository, and the file where they are implemented in the repository. This chart was originally made for the third edition of the book; per the edition policy above, the project has converged on the fourth edition (4th-edition content, a single module per topic, all under the `aima/` package). Empty implementations are a good place for contributors to look for an issue. The [aima-pseudocode](https://github.com/aimacode/aima-pseudocode) project describes all the algorithms from the book. An asterisk next to the file name denotes the algorithm is not fully implemented. Another great place for contributors to start is by adding tests and writing on the notebooks. You can see which algorithms have tests and notebook sections below. If the algorithm you want to work on is covered, don't worry! You can still add more tests and provide some examples of use in the notebook!
+
+| **Figure** | **Name (in 3<sup>rd</sup> edition)** | **Name (in repository)** | **File** | **Tests** | **Notebook**
+|:-------|:----------------------------------|:------------------------------|:--------------------------------|:-----|:---------|
+| 2      | Random-Vacuum-Agent               | `RandomVacuumAgent`           | [`agents.py`][agents]           | Done | Included |
+| 2      | Model-Based-Vacuum-Agent          | `ModelBasedVacuumAgent`       | [`agents.py`][agents]           | Done | Included |
+| 2.1    | Environment                       | `Environment`                 | [`agents.py`][agents]           | Done | Included |
+| 2.1    | Agent                             | `Agent`                       | [`agents.py`][agents]           | Done | Included |
+| 2.3    | Table-Driven-Vacuum-Agent         | `TableDrivenVacuumAgent`      | [`agents.py`][agents]           | Done | Included |
+| 2.7    | Table-Driven-Agent                | `TableDrivenAgent`            | [`agents.py`][agents]           | Done | Included |
+| 2.8    | Reflex-Vacuum-Agent               | `ReflexVacuumAgent`           | [`agents.py`][agents]           | Done | Included |
+| 2.10   | Simple-Reflex-Agent               | `SimpleReflexAgent`           | [`agents.py`][agents]           | Done | Included |
+| 2.12   | Model-Based-Reflex-Agent          | `ReflexAgentWithState`        | [`agents.py`][agents]           | Done | Included |
+| 3      | Problem                           | `Problem`                     | [`search.py`][search]           | Done | Included |
+| 3      | Node                              | `Node`                        | [`search.py`][search]           | Done | Included |
+| 3      | Queue                             | `Queue`                       | [`utils.py`][utils]             | Done | No Need  |
+| 3.1    | Simple-Problem-Solving-Agent      | `SimpleProblemSolvingAgent`   | [`search.py`][search]           | Done | Included |
+| 3.2    | Romania                           | `romania`                     | [`search.py`][search]           | Done | Included |
+| 3.7    | Tree-Search                       | `depth/breadth_first_tree_search`                 | [`search.py`][search]           | Done | Included |
+| 3.7    | Graph-Search                      | `depth/breadth_first_graph_search`                | [`search.py`][search]           | Done | Included |
+| 3.11   | Breadth-First-Search              | `breadth_first_graph_search`  | [`search.py`][search]           | Done | Included |
+| 3.14   | Uniform-Cost-Search               | `uniform_cost_search`         | [`search.py`][search]           | Done | Included |
+| 3.17   | Depth-Limited-Search              | `depth_limited_search`        | [`search.py`][search]           | Done | Included |
+| 3.18   | Iterative-Deepening-Search        | `iterative_deepening_search`  | [`search.py`][search]           | Done | Included |
+| 3.22   | Best-First-Search                 | `best_first_graph_search`     | [`search.py`][search]           | Done | Included |
+| 3.24   | A\*-Search                        | `astar_search`                | [`search.py`][search]           | Done | Included |
+| 3.26   | Recursive-Best-First-Search       | `recursive_best_first_search` | [`search.py`][search]           | Done | Included |
+| 4.2    | Hill-Climbing                     | `hill_climbing`               | [`search.py`][search]           | Done | Included |
+| 4.5    | Simulated-Annealing               | `simulated_annealing`         | [`search.py`][search]           | Done | Included |
+| 4.8    | Genetic-Algorithm                 | `genetic_algorithm`           | [`search.py`][search]           | Done | Included |
+| 4.11   | And-Or-Graph-Search               | `and_or_graph_search`         | [`search.py`][search]           | Done | Included |
+| 4.21   | Online-DFS-Agent                  | `online_dfs_agent`            | [`search.py`][search]           | Done | Included |
+| 4.24   | LRTA\*-Agent                      | `LRTAStarAgent`               | [`search.py`][search]           | Done | Included |
+| 5.3    | Minimax-Decision                  | `minimax_decision`            | [`games.py`][games]             | Done | Included |
+| 5.7    | Alpha-Beta-Search                 | `alpha_beta_search`           | [`games.py`][games]             | Done | Included |
+| 5.11   | Expectiminimax                    | `expect_minmax`               | [`games.py`][games]             | Done | Included |
+| 5.11   | Monte-Carlo-Tree-Search           | `monte_carlo_tree_search`     | [`games.py`][games]             | Done | Included |
+| 6      | CSP                               | `CSP`                         | [`csp.py`][csp]                 | Done | Included |
+| 6.3    | AC-3                              | `AC3`                         | [`csp.py`][csp]                 | Done | Included |
+| 6.5    | Backtracking-Search               | `backtracking_search`         | [`csp.py`][csp]                 | Done | Included |
+| 6.8    | Min-Conflicts                     | `min_conflicts`               | [`csp.py`][csp]                 | Done | Included |
+| 6.11   | Tree-CSP-Solver                   | `tree_csp_solver`             | [`csp.py`][csp]                 | Done | Included |
+| 7      | KB                                | `KB`                          | [`logic.py`][logic]             | Done | Included |
+| 7.1    | KB-Agent                          | `KB_AgentProgram`             | [`logic.py`][logic]             | Done | Included |
+| 7.7    | Propositional Logic Sentence      | `Expr`                        | [`utils.py`][utils]             | Done | Included |
+| 7.10   | TT-Entails                        | `tt_entails`                  | [`logic.py`][logic]             | Done | Included |
+| 7.12   | PL-Resolution                     | `pl_resolution`               | [`logic.py`][logic]             | Done | Included |
+| 7.14   | Convert to CNF                    | `to_cnf`                      | [`logic.py`][logic]             | Done | Included |
+| 7.15   | PL-FC-Entails?                    | `pl_fc_entails`               | [`logic.py`][logic]             | Done | Included |
+| 7.17   | DPLL-Satisfiable?                 | `dpll_satisfiable`            | [`logic.py`][logic]             | Done | Included |
+| 7.18   | WalkSAT                           | `WalkSAT`                     | [`logic.py`][logic]             | Done | Included |
+| 7.20   | Hybrid-Wumpus-Agent               | `HybridWumpusAgent`           | [`logic.py`][logic]             | Done | Included |
+| 7.22   | SATPlan                           | `SAT_plan`                    | [`logic.py`][logic]             | Done | Included |
+| 9      | Subst                             | `subst`                       | [`logic.py`][logic]             | Done | Included |
+| 9.1    | Unify                             | `unify`                       | [`logic.py`][logic]             | Done | Included |
+| 9.3    | FOL-FC-Ask                        | `fol_fc_ask`                  | [`logic.py`][logic]             | Done | Included |
+| 9.6    | FOL-BC-Ask                        | `fol_bc_ask`                  | [`logic.py`][logic]             | Done | Included |
+| 10.1   | Air-Cargo-problem                 | `air_cargo`                   | [`planning.py`][planning]       | Done | Included |
+| 10.2   | Spare-Tire-Problem                | `spare_tire`                  | [`planning.py`][planning]       | Done | Included |
+| 10.3   | Three-Block-Tower                 | `three_block_tower`           | [`planning.py`][planning]       | Done | Included |
+| 10.7   | Cake-Problem                      | `have_cake_and_eat_cake_too`  | [`planning.py`][planning]       | Done | Included |
+| 10.9   | Graphplan                         | `GraphPlan`                   | [`planning.py`][planning]       | Done | Included |
+| 10.13  | Partial-Order-Planner             | `PartialOrderPlanner`         | [`planning.py`][planning]       | Done | Included |
+| 11.1   | Job-Shop-Problem-With-Resources   | `job_shop_problem`            | [`planning.py`][planning]       | Done | Included |
+| 11.5   | Hierarchical-Search               | `hierarchical_search`         | [`planning.py`][planning]       | Done | Included |
+| 11.8   | Angelic-Search                    | `angelic_search`              | [`planning.py`][planning]       | Done | Included |
+| 11.10  | Doubles-tennis                    | `double_tennis_problem`       | [`planning.py`][planning]       | Done | Included |
+| 13     | Discrete Probability Distribution | `ProbDist`                    | [`probability.py`][probability] | Done | Included |
+| 13.1   | DT-Agent                          | `DTAgent`                     | [`probability.py`][probability] | Done | Included |
+| 14.9   | Enumeration-Ask                   | `enumeration_ask`             | [`probability.py`][probability] | Done | Included |
+| 14.11  | Elimination-Ask                   | `elimination_ask`             | [`probability.py`][probability] | Done | Included |
+| 14.13  | Prior-Sample                      | `prior_sample`                | [`probability.py`][probability] | Done | Included |
+| 14.14  | Rejection-Sampling                | `rejection_sampling`          | [`probability.py`][probability] | Done | Included |
+| 14.15  | Likelihood-Weighting              | `likelihood_weighting`        | [`probability.py`][probability] | Done | Included |
+| 14.16  | Gibbs-Ask                         | `gibbs_ask`                   | [`probability.py`][probability] | Done | Included |
+| 15.4   | Forward-Backward                  | `forward_backward`            | [`probability.py`][probability] | Done | Included |
+| 15.6   | Fixed-Lag-Smoothing               | `fixed_lag_smoothing`         | [`probability.py`][probability] | Done | Included |
+| 15.17  | Particle-Filtering                | `particle_filtering`          | [`probability.py`][probability] | Done | Included |
+| 15.4   | Kalman-Filter                     | `KalmanFilter`                | [`probability.py`][probability] | Done | Included |
+| 15.5   | Dynamic-Bayesian-Network          | `DynamicBayesNet`             | [`probability.py`][probability] | Done | Included |
+| 16.9   | Information-Gathering-Agent       | `InformationGatheringAgent`   | [`probability.py`][probability] | Done | Included |
+| 17.4   | Value-Iteration                   | `value_iteration`             | [`mdp.py`][mdp]                 | Done | Included |
+| 17.7   | Policy-Iteration                  | `policy_iteration`            | [`mdp.py`][mdp]                 | Done | Included |
+| 17.9   | POMDP-Value-Iteration             | `pomdp_value_iteration`       | [`mdp.py`][mdp]                 | Done | Included |
+| 17.4   | Dynamic-Decision-Network          | `pomdp_lookahead`             | [`mdp.py`](aima/mdp.py)          | Done | Included |
+| 18.2   | Iterated-Dominance                | `iterated_dominance`          | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.2   | Pure-Nash-Equilibria              | `pure_nash_equilibria`        | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.2   | Zero-Sum-Game (LP)                | `solve_zero_sum_game`         | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.3   | Shapley-Value                     | `shapley_value`               | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.3   | Core (cooperative game)           | `is_in_core`                  | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.4   | Voting (plurality/Borda/Condorcet)| `plurality_winner` etc.       | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.4   | Vickrey-Auction                   | `vickrey_auction`             | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.4.1 | Contract-Net-Protocol             | `contract_net`                | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.4.4 | Alternating-Offers-Bargaining     | `alternating_offers_bargaining` | [`game_theory.py`](aima/game_theory.py) | Done | Included |
+| 18.5   | Decision-Tree-Learning            | `DecisionTreeLearner`         | [`learning.py`][learning]       | Done | Included |
+| 18.8   | Cross-Validation                  | `cross_validation`            | [`learning.py`][learning]       | Done | Included |
+| 18.11  | Decision-List-Learning            | `DecisionListLearner`         | [`learning.py`][learning]       | Done | Included |
+| 18.24  | Back-Prop-Learning                | `BackPropagationLearner`      | [`learning.py`][learning]       | Done | Included |
+| 18.34  | AdaBoost                          | `AdaBoost`                    | [`learning.py`][learning]       | Done | Included |
+| 20.X   | EM (Mixture of Gaussians)         | `gaussian_mixture_em`         | [`learning.py`][learning]       | Done | Included |
+| 20.3.2 | EM (Bayes net hidden variable)    | `naive_bayes_em`              | [`learning.py`][learning]       | Done | Included |
+| 20.3   | Baum-Welch (HMM learning)         | `baum_welch`                  | [`probability.py`][probability] | Done | Included |
+| 19.2   | Current-Best-Learning             | `current_best_learning`       | [`knowledge.py`](aima/knowledge.py)  | Done | Included |
+| 19.3   | Version-Space-Learning            | `version_space_learning`      | [`knowledge.py`](aima/knowledge.py)  | Done | Included |
+| 19.8   | Minimal-Consistent-Det            | `minimal_consistent_det`      | [`knowledge.py`](aima/knowledge.py)  | Done | Included |
+| 19.12  | FOIL                              | `FOILContainer`              | [`knowledge.py`](aima/knowledge.py)  | Done | Included |
+| 21.2   | Passive-ADP-Agent                 | `PassiveADPAgent`             | [`reinforcement_learning.py`][rl]                   | Done | Included |
+| 21.4   | Passive-TD-Agent                  | `PassiveTDAgent`              | [`reinforcement_learning.py`][rl]                   | Done | Included |
+| 21.8   | Q-Learning-Agent                  | `QLearningAgent`              | [`reinforcement_learning.py`][rl]                   | Done | Included |
+| 21.8   | SARSA-Agent                       | `SARSALearningAgent`          | [`reinforcement_learning.py`][rl]                   | Done | Included |
+| 22.1   | HITS                              | `HITS`                        | [`nlp.py`][nlp]                 | Done | Included |
+| 23     | Chart-Parse                       | `Chart`                       | [`nlp.py`][nlp]                 | Done | Included |
+| 23.5   | CYK-Parse                         | `CYK_parse`                   | [`nlp.py`][nlp]                 | Done | Included |
+| 25.9   | Monte-Carlo-Localization          | `monte_carlo_localization`    | [`probability.py`][probability] | Done | Included |
+
+
+# Index of data structures
+
+Here is a table of the implemented data structures, the figure, name of the implementation in the repository, and the file where they are implemented.
+
+| **Figure** | **Name (in repository)** | **File** |
+|:-------|:--------------------------------|:--------------------------|
+| 3.2    | romania_map                     | [`search.py`][search]     |
+| 4.9    | vacumm_world                    | [`search.py`][search]     |
+| 4.23   | one_dim_state_space             | [`search.py`][search]     |
+| 6.1    | australia_map                   | [`search.py`][search]     |
+| 7.13   | wumpus_world_inference          | [`logic.py`][logic]       |
+| 7.16   | horn_clauses_KB                 | [`logic.py`][logic]       |
+| 17.1   | sequential_decision_environment | [`mdp.py`][mdp]           |
+| 18.2   | waiting_decision_tree           | [`learning.py`][learning] |
+
+
+# Acknowledgements
+
+Many thanks for contributions over the years. I got bug reports, corrected code, and other support from Darius Bacon, Phil Ruggera, Peng Shao, Amit Patil, Ted Nienstedt, Jim Martin, Ben Catanzariti, and others. Now that the project is on GitHub, you can see the [contributors](https://github.com/aimacode/aima-python/graphs/contributors) who are doing a great job of actively improving the project. Many thanks to all contributors, especially [@darius](https://github.com/darius), [@SnShine](https://github.com/SnShine), [@reachtarunhere](https://github.com/reachtarunhere), [@antmarakis](https://github.com/antmarakis), [@Chipe1](https://github.com/Chipe1), [@ad71](https://github.com/ad71) and [@MariannaSpyrakou](https://github.com/MariannaSpyrakou).
+
+<!---Reference Links-->
+[agents]:../master/aima/agents.py
+[csp]:../master/aima/csp.py
+[games]:../master/aima/games.py
+[grid]:../master/grid.py
+[knowledge]:../master/aima/knowledge.py
+[learning]:../master/aima/learning.py
+[logic]:../master/aima/logic.py
+[mdp]:../master/aima/mdp.py
+[nlp]:../master/aima/nlp.py
+[planning]:../master/aima/planning.py
+[probability]:../master/aima/probability.py
+[rl]:../master/aima/reinforcement_learning.py
+[search]:../master/aima/search.py
+[utils]:../master/aima/utils.py
+[text]:../master/aima/text.py
