@@ -1,8 +1,11 @@
-# Ignore for Jeremy
+# Ignore for Jeremy (local link)
 pyproject.toml
 diagnostics.py
 diagnostics_gui.py
 
+# Unignore actual file
+!aima-python/diagnostics.py
+!aima-python/diagnostics_gui.py
 
 # Ignore
 env/
