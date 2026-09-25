@@ -1,0 +1,4 @@
+# Ignore for Jeremy
+pyproject.toml
+diagnostics.py
+diagnostics_gui.py
