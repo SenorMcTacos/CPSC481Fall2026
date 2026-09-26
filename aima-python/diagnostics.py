@@ -13,15 +13,7 @@ class Diagnostics:
 
     def __init__(
         self,
-    ):
-        ...  # placeholder for the student's code, to be replaced by the student
-        # bayes_net = BayesNet("Asia")
-        # bayes_net.add("")
-        # bayes_net.add("Asia")
-        # bayes_net.add("Smoking")
-        # bayes_net.add("Xray")
-        # bayes_net.add("Dyspnea")
-
+    ): ...  # placeholder for the student's code, to be replaced by the student
     def diagnose(self, asia, smoking, xray, dyspnea):
         # To be implemented by the student
 
@@ -67,14 +59,18 @@ class Diagnostics:
         tborc_chance = diagnose_enumerate_ask(
             "TBorCancer", asia_c, smoking_c, xray_c, dyspnea_c, cancer_bayes
         )
-        print(f"Tborc: {tborc_chance}")
+        # print(f"Tborc: {tborc_chance}")
         # tb_chance += tborc_chance
         # lc_chance += tborc_chance
 
+        # Evaluate disease for largest chances
         if tb_chance > lc_chance and tb_chance > br_chance:
             return ["TB", tb_chance]
         elif lc_chance > tb_chance and lc_chance > br_chance:
-            return ["Lung Cancer", lc_chance]
+            return [
+                "Cancer",
+                lc_chance,
+            ]  # Apparently it wants the word cancer back instead of Lung Cancer
         elif br_chance > lc_chance and br_chance > tb_chance:
             return ["Bronchitis", br_chance]
         else:
@@ -143,13 +139,13 @@ if __name__ == "__main__":
     # print(enumeration_ask("Test", dict(), test).show_approx())
     # print(enumeration_ask("Accident", dict(Cloudy=T, Freezing=T), cloudy_bn)[T])
     # print(elimination_ask("Accident", dict(Cloudy=T, Freezing=T), cloudy_bn)[T])
-    print(enumeration_ask("TB", dict(), test_cancer_bayes)[T])
-    print(enumeration_ask("LungCancer", dict(), test_cancer_bayes)[T])
-    print(enumeration_ask("Bronchitis", dict(), test_cancer_bayes)[T])
+    # print(enumeration_ask("TB", dict(), test_cancer_bayes)[T])
+    # print(enumeration_ask("LungCancer", dict(), test_cancer_bayes)[T])
+    # print(enumeration_ask("Bronchitis", dict(), test_cancer_bayes)[T])
 
-    balls = Diagnostics()
-    print(balls.diagnose("Yes", "No", "Abnormal", "NA"))
-    print(balls.diagnose("NA", "NA", "NA", "NA"))
+    # balls = Diagnostics()
+    # print(balls.diagnose("No", "Yes", "Abnormal", "Present"))
+    # print(balls.diagnose("NA", "NA", "NA", "NA"))
     # print(enumeration_ask('Burglary', dict(JohnCalls=T, MaryCalls=T), burglary))
     # print(enumeration_ask('Burglary', dict(JohnCalls=T, MaryCalls=T), burglary)[T])
     # print(burglary.variable_node('Burglary').p(T, {}))
