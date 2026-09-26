@@ -30,7 +30,7 @@ class Diagnostics:
             [
                 ("Asia", "", 0.01),
                 ("Smoking", "", 0.5),
-                ("TB", "Asia", {T: 0.05, F: 0.1}),
+                ("TB", "Asia", {T: 0.05, F: 0.01}),
                 ("LungCancer", "Smoking", {T: 0.1, F: 0.01}),
                 ("Bronchitis", "Smoking", {T: 0.6, F: 0.3}),
                 (
@@ -64,13 +64,19 @@ class Diagnostics:
         br_chance = diagnose_enumerate_ask(
             "Bronchitis", asia_c, smoking_c, xray_c, dyspnea_c, cancer_bayes
         )
+        tborc_chance = diagnose_enumerate_ask(
+            "TBorCancer", asia_c, smoking_c, xray_c, dyspnea_c, cancer_bayes
+        )
+        print(f"Tborc: {tborc_chance}")
+        # tb_chance += tborc_chance
+        # lc_chance += tborc_chance
 
         if tb_chance > lc_chance and tb_chance > br_chance:
             return ["TB", tb_chance]
         elif lc_chance > tb_chance and lc_chance > br_chance:
-            return ["Lung Cancer", tb_chance]
+            return ["Lung Cancer", lc_chance]
         elif br_chance > lc_chance and br_chance > tb_chance:
-            return ["Bronchitis", tb_chance]
+            return ["Bronchitis", br_chance]
         else:
             return ["Error", 0]
 
@@ -78,14 +84,25 @@ class Diagnostics:
 def convert_to_bool(input):
     if input == "Yes" or input == "Present" or input == "Abnormal":
         return T
-    else:
+    elif input == "No" or input == "Normal" or input == "Absent":
         return F
+    else:
+        return "NA"
 
 
 def diagnose_enumerate_ask(disease_to_find, asia, smoking, xray, dyspnea, bn):
+    table_dict: dict = {}
+    if asia != "NA":
+        table_dict["Asia"] = asia
+    if smoking != "NA":
+        table_dict["Smoking"] = smoking
+    if xray != "NA":
+        table_dict["Xray"] = xray
+    if dyspnea != "NA":
+        table_dict["Dyspnea"] = dyspnea
     calc = enumeration_ask(
         disease_to_find,
-        dict(Asia=asia, Smoking=smoking, Dyspnea=dyspnea, Xray=xray),
+        table_dict,
         bn,
     )[T]
 
@@ -101,11 +118,11 @@ if __name__ == "__main__":
             ("TBA", "Balls", {T: 0.05, F: 0.1}),
         ]
     )
-    cancer_bayes_2 = BayesNet(
+    test_cancer_bayes = BayesNet(
         [
             ("Asia", "", 0.01),
             ("Smoking", "", 0.5),
-            ("TB", "Asia", {T: 0.05, F: 0.1}),
+            ("TB", "Asia", {T: 0.05, F: 0.01}),
             ("LungCancer", "Smoking", {T: 0.1, F: 0.01}),
             ("Bronchitis", "Smoking", {T: 0.6, F: 0.3}),
             (
@@ -121,29 +138,18 @@ if __name__ == "__main__":
             ),
         ]
     )
-    cloudy_bn = BayesNet(
-        [
-            ("Cloudy", "", 0.75),
-            ("Freezing", "", 0.333),
-            (
-                "Accident",
-                "Cloudy Freezing",
-                {(T, T): 0.8, (T, F): 0.5, (F, T): 0.6, (F, F): 0.1},
-            ),
-        ]
-    )
+
     # print(enumeration_ask("Asia", dict(Smoking=T), cancer_bayes_2))
     # print(enumeration_ask("Test", dict(), test).show_approx())
     # print(enumeration_ask("Accident", dict(Cloudy=T, Freezing=T), cloudy_bn)[T])
     # print(elimination_ask("Accident", dict(Cloudy=T, Freezing=T), cloudy_bn)[T])
-    print(
-        enumeration_ask(
-            "TB", dict(Asia=T, Smoking=T, Xray=T, Dyspnea=T), cancer_bayes_2
-        )[T]
-    )
+    print(enumeration_ask("TB", dict(), test_cancer_bayes)[T])
+    print(enumeration_ask("LungCancer", dict(), test_cancer_bayes)[T])
+    print(enumeration_ask("Bronchitis", dict(), test_cancer_bayes)[T])
 
     balls = Diagnostics()
-    print(balls.diagnose("Yes", "Yes", "Abnormal", "Present"))
+    print(balls.diagnose("Yes", "No", "Abnormal", "NA"))
+    print(balls.diagnose("NA", "NA", "NA", "NA"))
     # print(enumeration_ask('Burglary', dict(JohnCalls=T, MaryCalls=T), burglary))
     # print(enumeration_ask('Burglary', dict(JohnCalls=T, MaryCalls=T), burglary)[T])
     # print(burglary.variable_node('Burglary').p(T, {}))
