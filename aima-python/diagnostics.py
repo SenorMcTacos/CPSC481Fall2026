@@ -1,5 +1,3 @@
-import enum
-from string.templatelib import convert
 import sys
 
 from aima.probability import *
