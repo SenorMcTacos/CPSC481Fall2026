@@ -1,7 +1,7 @@
 # Ignore for Jeremy (local link)
 pyproject.toml
-diagnostics.py
-diagnostics_gui.py
+
+CLASSWORK/
 
 # Unignore actual file
 !aima-python/diagnostics.py

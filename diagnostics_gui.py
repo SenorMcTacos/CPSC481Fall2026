@@ -1,0 +1,1 @@
+/home/senortaco/Things/School/CPSC491-AI/aima-python/diagnostics_gui.py
